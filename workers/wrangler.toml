@@ -1,0 +1,12 @@
+name = "zoolala-kv"
+type = "javascript"
+
+account_id = "c9df6c97d3097be1f22162b8a9a34f35"
+workers_dev = true
+route = ""
+zone_id = "85160c6b091f21ec82ec2484f3c98b62"
+compatibility_date = "2021-10-14"
+
+kv_namespaces = [ 
+    { binding = "ZLLKV", id = "418f2353d2164f38a663b31805759bc7", preview_id = "256a01ef7e794843a231851245cfbba1" }
+]
