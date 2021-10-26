@@ -4,8 +4,8 @@
       class="col-9 full-width"
       title="Restaurants"
       :columns="columns"
-      :loading="isLoading"
       :rows="restaurants"
+      row-key="name"
     >
       <template #top-right>
         <q-btn
@@ -112,6 +112,7 @@ export default defineComponent({
           }
         })
         if (response && 'data' in response) {
+          console.log(response.data)
           restaurants.value = response.data as Restaurant[]
         }
       } catch (e) {
