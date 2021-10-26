@@ -56,7 +56,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       env: ctx.dev
         ? { BASE_URL: 'http://localhost:8787' }
-        : { BASE_URL: '/api' },
+        : { BASE_URL: 'https://admin.zoolala.events/api' },
 
       // transpile: false,
       // publicPath: '/',
