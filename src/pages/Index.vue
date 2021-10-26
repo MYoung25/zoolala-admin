@@ -1,49 +1,145 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="row items-start justify-evenly q-ma-xl">
+    <q-table
+      class="col-12"
+      title="Restaurants"
+      :columns="columns"
+      :visible-columns="['name', 'food']"
+      :loading="isLoading"
+    >
+      <template #top-right>
+        <q-btn
+          label="Add Restaurant"
+          color="positive"
+          @click="toggleDialog"
+        />
+      </template>
+      <template #body-cell-actions="props">
+        <q-td :props="props">
+          <div>
+            <q-btn
+              label="Delete"
+              color="negative"
+              :loading="isLoading"
+              @click="() => {deleteRestaurant(props.row)}"
+            />
+          </div>
+          <div>
+            {{ props.row.details }}
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+    <q-dialog
+      v-model="isDialogOpen"
+    >
+      <q-card>
+        <q-card-section>
+          <div class="text-h5">Add Restaurant</div>
+          <q-input v-model="newRestaurant.name" label="Name" filled class="q-mb-md" />
+          <q-input v-model="newRestaurant.food" label="Food" filled />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            label="Cancel"
+            flat
+            :loading="isLoading"
+            @click="toggleDialog"
+          />
+          <q-btn
+            label="Save"
+            color="positive"
+            :loading="isLoading"
+            @click="addRestaurant"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script lang="ts">
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/CompositionComponent.vue';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
+import { useQuasar } from 'quasar'
+import { api } from 'boot/axios'
+
+interface Restaurant {
+  name: string
+  food: string
+}
+
+const columns = [
+  {
+    name: 'name',
+    label: 'Name',
+    align: 'left',
+    field: (row: Restaurant) => row.name,
+  },
+  {
+    name: 'food',
+    label: 'Food',
+    align: 'left',
+    field: (row: Restaurant) => row.food,
+  },
+  {
+    name: 'action',
+    label: 'Actions',
+    align: 'center',
+    field: () => undefined,
+  }
+]
 
 export default defineComponent({
   name: 'PageIndex',
-  components: { ExampleComponent },
   setup() {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1'
-      },
-      {
-        id: 2,
-        content: 'ct2'
-      },
-      {
-        id: 3,
-        content: 'ct3'
-      },
-      {
-        id: 4,
-        content: 'ct4'
-      },
-      {
-        id: 5,
-        content: 'ct5'
+    const $q = useQuasar()
+    const isLoading = ref(true)
+    const isDialogOpen = ref(false)
+    const restaurants = ref([])
+    const newRestaurant = ref({
+      name: '',
+      food: '',
+    })
+
+    onMounted(async () => {
+      try {
+        await api.get('/api')
+      } catch (e) {
+        $q.notify({
+          type: 'negative',
+          message: 'Something went wrong'
+        })
       }
-    ]);
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-    return { todos, meta };
+      isLoading.value = false
+    })
+
+    return {
+      columns,
+      isLoading,
+      restaurants,
+      isDialogOpen,
+      newRestaurant,
+      deleteRestaurant (row: unknown) {
+        console.log(row)
+      },
+      toggleDialog () {
+        isDialogOpen.value = !isDialogOpen.value
+      },
+      async addRestaurant () {
+        isLoading.value = true
+        try {
+          await api.post('/apis', newRestaurant.value)
+          const data = await api.get('/api')
+          console.log(data)
+        } catch (e: unknown) {
+          $q.notify({
+            type: 'negative',
+            message: 'Something went wrong'
+          })
+        }
+        isLoading.value = false
+      },
+    }
   }
 });
 </script>
