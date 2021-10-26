@@ -1,35 +1,6 @@
 <template>
   <q-page class="row items-start justify-evenly q-ma-xl">
-    <q-table
-      class="col-9 full-width"
-      title="Restaurants"
-      :columns="columns"
-      :loading="isLoading"
-      :rows="restaurants"
-    >
-      <template #top-right>
-        <q-btn
-          label="Add Restaurant"
-          color="positive"
-          @click="toggleDialog"
-        />
-      </template>
-      <template #body-cell-actions="props">
-        <q-td :props="props">
-          <div>
-            <q-btn
-              label="Delete"
-              color="negative"
-              :loading="isLoading"
-              @click="() => {deleteRestaurant(props.row)}"
-            />
-          </div>
-          <div>
-            {{ props.row.details }}
-          </div>
-        </q-td>
-      </template>
-    </q-table>
+
     <div class="col-3 text-center">
       <p>This allows an administrator to choose which restaurants will show up on <a class="text-primary" href="https://zoolala.events">ZooLaLa.Events</a></p>
     </div>
