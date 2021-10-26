@@ -124,11 +124,19 @@ export default defineComponent({
       },
       toggleDialog () {
         isDialogOpen.value = !isDialogOpen.value
+        newRestaurant.value = {
+          name: '',
+          food: '',
+        }
       },
       async addRestaurant () {
         isLoading.value = true
         try {
-          await api.post('/apis', newRestaurant.value)
+          await api.post('/apis', newRestaurant.value, {
+            headers: {
+              'content-type': 'application/json',
+            }
+          })
           const data = await api.get('/api')
           console.log(data)
         } catch (e: unknown) {
