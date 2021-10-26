@@ -112,7 +112,6 @@ export default defineComponent({
           }
         })
         if (response && 'data' in response) {
-          console.log(response.data)
           restaurants.value = response.data as Restaurant[]
         }
       } catch (e) {
