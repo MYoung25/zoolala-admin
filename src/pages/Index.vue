@@ -1,7 +1,7 @@
 <template>
   <q-page class="row items-start justify-evenly q-ma-xl">
     <q-table
-      class="col-9"
+      class="col-9 full-width"
       title="Restaurants"
       :columns="columns"
       :loading="isLoading"
