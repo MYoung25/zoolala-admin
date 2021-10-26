@@ -31,7 +31,7 @@
       </template>
     </q-table>
     <div class="col-3 text-center">
-      <p>This allows an administrator to choose which restaurants will show up on <a class="text-primary" href="https://zoolala.events">ZooLaLa.Events</a></p>
+      <p>This allows an administrator to choose which restaurants will show up on <a class="text-primary" href="https://zoolala.events">ZooLaLa.Events</a>... in the future</p>
     </div>
     <q-dialog
       v-model="isDialogOpen"
