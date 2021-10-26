@@ -103,7 +103,11 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        await api.get('/api')
+        await api.get('/api', {
+          params: {
+            type: 'restaurant'
+          }
+        })
       } catch (e) {
         $q.notify({
           type: 'negative',
@@ -132,7 +136,10 @@ export default defineComponent({
       async addRestaurant () {
         isLoading.value = true
         try {
-          await api.post('/apis', newRestaurant.value, {
+          await api.post('/api', {
+            type: 'restaurant',
+            ...newRestaurant.value
+          }, {
             headers: {
               'content-type': 'application/json',
             }
