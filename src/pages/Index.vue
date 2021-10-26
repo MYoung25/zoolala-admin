@@ -1,11 +1,11 @@
 <template>
   <q-page class="row items-start justify-evenly q-ma-xl">
     <q-table
-      class="col-12"
+      class="col-9"
       title="Restaurants"
       :columns="columns"
-      :visible-columns="['name', 'food']"
       :loading="isLoading"
+      :rows="restaurants"
     >
       <template #top-right>
         <q-btn
@@ -30,6 +30,9 @@
         </q-td>
       </template>
     </q-table>
+    <div class="col-3 text-center">
+      <p>This allows an administrator to choose which restaurants will show up on <a class="text-primary" href="https://zoolala.events">ZooLaLa.Events</a></p>
+    </div>
     <q-dialog
       v-model="isDialogOpen"
     >
@@ -82,7 +85,7 @@ const columns = [
     field: (row: Restaurant) => row.food,
   },
   {
-    name: 'action',
+    name: 'actions',
     label: 'Actions',
     align: 'center',
     field: () => undefined,
@@ -95,7 +98,7 @@ export default defineComponent({
     const $q = useQuasar()
     const isLoading = ref(true)
     const isDialogOpen = ref(false)
-    const restaurants = ref([])
+    const restaurants = ref<Restaurant[]>([])
     const newRestaurant = ref({
       name: '',
       food: '',
@@ -103,11 +106,14 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        await api.get('/api', {
+        const response = await api.get('/', {
           params: {
             type: 'restaurant'
           }
         })
+        if (response && 'data' in response) {
+          restaurants.value = response.data as Restaurant[]
+        }
       } catch (e) {
         $q.notify({
           type: 'negative',
@@ -117,26 +123,54 @@ export default defineComponent({
       isLoading.value = false
     })
 
+    function toggleDialog () {
+      isDialogOpen.value = !isDialogOpen.value
+      newRestaurant.value = {
+        name: '',
+        food: '',
+      }
+    }
+
     return {
       columns,
       isLoading,
       restaurants,
       isDialogOpen,
       newRestaurant,
-      deleteRestaurant (row: unknown) {
-        console.log(row)
-      },
-      toggleDialog () {
-        isDialogOpen.value = !isDialogOpen.value
-        newRestaurant.value = {
-          name: '',
-          food: '',
+      toggleDialog,
+      async deleteRestaurant (row: Restaurant) {
+        try {
+          await api.delete('/', {
+            headers: {
+              'content-type': 'application/json',
+            },
+            data: {
+              type: 'restaurant',
+              name: row.name
+            }
+          })
+          const response = await api.get('/', {
+            params: {
+              type: 'restaurant'
+            }
+          })
+          if (response && 'data' in response) {
+            restaurants.value = response.data as Restaurant[]
+          }
+        } catch (e) {
+          $q.notify({
+            type: 'negative',
+            message: 'Something went wrong'
+          })
         }
       },
       async addRestaurant () {
+        if (newRestaurant.value.name === '' || newRestaurant.value.food === '') {
+          return
+        }
         isLoading.value = true
         try {
-          await api.post('/api', {
+          await api.post('/', {
             type: 'restaurant',
             ...newRestaurant.value
           }, {
@@ -144,14 +178,21 @@ export default defineComponent({
               'content-type': 'application/json',
             }
           })
-          const data = await api.get('/api')
-          console.log(data)
+          const response = await api.get('/', {
+            params: {
+              type: 'restaurant'
+            }
+          })
+          if (response && 'data' in response) {
+            restaurants.value = response.data as Restaurant[]
+          }
         } catch (e: unknown) {
           $q.notify({
             type: 'negative',
             message: 'Something went wrong'
           })
         }
+        toggleDialog()
         isLoading.value = false
       },
     }
